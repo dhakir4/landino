@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Landino AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            keyframes: {
+              bounce: {
+                '0%, 100%': { transform: 'translateY(-25%)', animationTimingFunction: 'cubic-bezier(0.8,0,1,1)' },
+                '50%': { transform: 'none', animationTimingFunction: 'cubic-bezier(0,0,0.2,1)' },
+              }
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+        .backdrop-blur-sm {
+            --tw-backdrop-blur: blur(4px);
+            backdrop-filter: var(--tw-backdrop-filter);
+        }
+        /* For custom scrollbar */
+        .sidebar-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+        .sidebar-scroll::-webkit-scrollbar-thumb {
+            background-color: #d1d5db; /* gray-400 */
+            border-radius: 20px;
+        }
+    </style>
+  </head>
+  <body class="bg-white text-gray-800 font-sans overflow-hidden">
+    <!-- SVG Icon Definitions -->
+    <svg style="display: none;">
+        <symbol id="icon-send" viewBox="0 0 24 24">
+            <path d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.405z" />
+        </symbol>
+        <symbol id="icon-bot" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 8V4H8"/><rect x="4" y="12" width="16" height="8" rx="2"/><path d="M12 12v0"/><path d="M16 16v0"/><path d="M8 16v0"/>
+        </symbol>
+        <symbol id="icon-user" viewBox="0 0 24 24">
+            <path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clip-rule="evenodd" />
+        </symbol>
+        <symbol id="icon-plus" viewBox="0 0 24 24">
+            <path fill-rule="evenodd" d="M12 3.75a.75.75 0 01.75.75v6.75h6.75a.75.75 0 010 1.5h-6.75v6.75a.75.75 0 01-1.5 0v-6.75H4.5a.75.75 0 010-1.5h6.75V4.5a.75.75 0 01.75-.75z" clip-rule="evenodd" />
+        </symbol>
+        <symbol id="icon-cog" viewBox="0 0 24 24">
+            <path d="M14.625 10.375a.375.375 0 100-.75.375.375 0 000 .75z" /><path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM11.25 8.625a.375.375 0 100-.75.375.375 0 000 .75zM10.125 10.375a.375.375 0 100-.75.375.375 0 000 .75zM8.625 11.25a.375.375 0 10-.75 0 .375.375 0 00.75 0zM10.375 12a.375.375 0 10-.75 0 .375.375 0 00.75 0zm.375 1.125a.375.375 0 100-.75.375.375 0 000 .75zM12 13.375a.375.375 0 10-.75 0 .375.375 0 00.75 0zm1.125-.375a.375.375 0 100-.75.375.375 0 000 .75zM14.25 11.25a.375.375 0 10-.75 0 .375.375 0 00.75 0zm-.375-1.125a.375.375 0 100-.75.375.375 0 000 .75zM12 8.25a.375.375 0 100-.75.375.375 0 000 .75zm-1.875.375a.375.375 0 10-.75 0 .375.375 0 00.75 0zm-1.5 1.5a.375.375 0 10-.75 0 .375.375 0 00.75 0zM8.25 12a.375.375 0 100 .75.375.375 0 000-.75zm1.875.375a.375.375 0 10.75 0 .375.375 0 00-.75 0zm1.125 1.125a.375.375 0 10.75 0 .375.375 0 00-.75 0zM13.125 12a.375.375 0 10.75 0 .375.375 0 00-.75 0zm1.5-1.5a.375.375 0 10.75 0 .375.375 0 00-.75 0zm-1.125-1.125a.375.375 0 10.75 0 .375.375 0 00-.75 0zM12 15.75a3.75 3.75 0 100-7.5 3.75 3.75 0 000 7.5z" clip-rule="evenodd" />
+        </symbol>
+        <symbol id="icon-x-mark" viewBox="0 0 24 24">
+            <path fill-rule="evenodd" d="M5.47 5.47a.75.75 0 011.06 0L12 10.94l5.47-5.47a.75.75 0 111.06 1.06L13.06 12l5.47 5.47a.75.75 0 11-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 01-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 010-1.06z" clip-rule="evenodd" />
+        </symbol>
+        <symbol id="icon-menu" viewBox="0 0 24 24">
+            <path fill-rule="evenodd" d="M3 6.75A.75.75 0 013.75 6h16.5a.75.75 0 010 1.5H3.75A.75.75 0 013 6.75zM3 12a.75.75 0 01.75-.75h16.5a.75.75 0 010 1.5H3.75A.75.75 0 013 12zm0 5.25a.75.75 0 01.75-.75h16.5a.75.75 0 010 1.5H3.75a.75.75 0 01-.75-.75z" clip-rule="evenodd" />
+        </symbol>
+        <symbol id="icon-pencil" viewBox="0 0 24 24">
+            <path d="M21.731 2.269a2.625 2.625 0 00-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 000-3.712zM19.513 8.199l-3.712-3.712-8.4 8.4a5.25 5.25 0 00-1.32 2.214l-.8 2.685a.75.75 0 00.933.933l2.685-.8a5.25 5.25 0 002.214-1.32l8.4-8.4z" /><path d="M5.25 5.25a3 3 0 00-3 3v10.5a3 3 0 003 3h10.5a3 3 0 003-3V13.5a.75.75 0 00-1.5 0v5.25a1.5 1.5 0 01-1.5 1.5H5.25a1.5 1.5 0 01-1.5-1.5V8.25a1.5 1.5 0 011.5-1.5h5.25a.75.75 0 000-1.5H5.25z" />
+        </symbol>
+        <symbol id="icon-sparkle" viewBox="0 0 24 24">
+            <path fill-rule="evenodd" d="M9.315 7.584C10.567 6.332 12.536 6.332 13.788 7.584l3.838 3.838a3.001 3.001 0 11-4.243 4.243L12 14.354l-1.383 1.31a3 3 0 11-4.243-4.243l3.838-3.838zM12 2.25a.75.75 0 01.75.75V5.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zm0 15a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V18a.75.75 0 01.75-.75zM4.036 4.036a.75.75 0 011.06 0l1.768 1.768a.75.75 0 11-1.06 1.06L4.036 5.096a.75.75 0 010-1.06zm14.128 14.128a.75.75 0 011.06 0l1.768 1.768a.75.75 0 11-1.06 1.06l-1.768-1.768a.75.75 0 010-1.06zM19.964 4.036a.75.75 0 010 1.06l-1.768 1.768a.75.75 0 11-1.06-1.06l1.768-1.768a.75.75 0 011.06 0zm-14.128 14.128a.75.75 0 010 1.06l-1.768 1.768a.75.75 0 11-1.06-1.06l1.768-1.768a.75.75 0 011.06 0zM18 12a.75.75 0 01.75.75h2.25a.75.75 0 010 1.5H18.75a.75.75 0 01-.75-.75V12a.75.75 0 01.75-.75zm-15 0a.75.75 0 01.75.75v.008a.75.75 0 01-1.5 0V12a.75.75 0 01.75-.75z" clip-rule="evenodd" />
+        </symbol>
+        <symbol id="icon-microphone" viewBox="0 0 24 24">
+            <path d="M8.25 4.5a3.75 3.75 0 117.5 0v8.25a3.75 3.75 0 11-7.5 0V4.5z" /><path d="M6 10.5a.75.75 0 01.75.75v.75a4.5 4.5 0 009 0v-.75a.75.75 0 011.5 0v.75a6 6 0 11-12 0v-.75A.75.75 0 016 10.5z" />
+        </symbol>
+        <symbol id="icon-chat-bubble" viewBox="0 0 24 24">
+            <path fill-rule="evenodd" d="M4.804 21.644A6.707 6.707 0 006 21.75a6.75 6.75 0 006.75-6.75v-2.5a.75.75 0 011.5 0v2.5a8.25 8.25 0 01-8.25 8.25c-1.33 0-2.6-.3-3.75-.855a.75.75 0 01-.44-1.282A3.733 3.733 0 016 18.75v-2.25a.75.75 0 011.5 0v2.25a2.25 2.25 0 00-2.696 2.244a.75.75 0 01.95-1.054 5.232 5.232 0 015.246-2.944v-2.5a.75.75 0 011.5 0v2.5a6.75 6.75 0 01-6.75 6.75c-.613 0-1.21-.083-1.78-.244a.75.75 0 01-.22-1.468z" clip-rule="evenodd" /><path d="M.75 3h13.5a.75.75 0 010 1.5H.75a.75.75 0 010-1.5zM.75 7.5h13.5a.75.75 0 010 1.5H.75a.75.75 0 010-1.5zM.75 12h10.5a.75.75 0 010 1.5H.75a.75.75 0 010-1.5z" />
+        </symbol>
+        <symbol id="icon-arrow-right-on-rect" viewBox="0 0 24 24">
+            <path fill-rule="evenodd" d="M12 2.25a.75.75 0 01.75.75v9a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM6.166 5.106a.75.75 0 010 1.06 8.25 8.25 0 1011.668 0 .75.75 0 111.06-1.06c3.808 3.807 3.808 9.98 0 13.788-3.807 3.808-9.98 3.808-13.788 0-3.808-3.807-3.808-9.98 0-13.788a.75.75 0 011.06 0z" clip-rule="evenodd" />
+        </symbol>
+    </svg>
+
+    <div id="app-root" class="flex h-screen bg-white text-gray-800 font-sans overflow-hidden">
+      <!-- Sidebar placeholder -->
+      <div id="sidebar-container"></div>
+      
+      <div class="flex-1 flex flex-col transition-all duration-300">
+        <main class="flex-1 flex flex-col relative">
+          <!-- TopBar placeholder -->
+          <div id="top-bar-container"></div>
+          
+          <div class="flex-1 flex flex-col justify-between overflow-y-auto w-full max-w-4xl mx-auto pb-4 pt-16 md:pt-4">
+              <!-- Main content: Greeting or Message list -->
+              <div id="main-content" class="flex-1 flex flex-col"></div>
+              
+             <div class="px-4 mt-4">
+                <!-- ChatInput placeholder -->
+                <div id="chat-input-container"></div>
+              </div>
+          </div>
+        </main>
+      </div>
+
+      <!-- Login Modal placeholder -->
+      <div id="login-modal-container"></div>
+    </div>
+
+    <script type="importmap">
+{
+  "imports": {
+    "@google/genai": "https://esm.sh/@google/genai@^1.7.0",
+    "react": "https://esm.sh/react@^19.1.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.1.0/",
+    "react/": "https://esm.sh/react@^19.1.0/"
+  }
+}
+</script>
+
+    <script type="module">
+      import { GoogleGenAI } from '@google/genai';
+
+      // --- START: APPLICATION STATE ---
+      const state = {
+        sessions: [],
+        activeSessionId: null,
+        isLoading: false,
+        user: null,
+        isLoginOpen: false,
+        isSidebarExpanded: true,
+        isSidebarOpen: false,
+        imagePreview: null,
+        imageFile: null,
+      };
+
+      // --- START: DOM SELECTORS ---
+      const dom = {
+        sidebarContainer: document.getElementById('sidebar-container'),
+        topBarContainer: document.getElementById('top-bar-container'),
+        mainContent: document.getElementById('main-content'),
+        chatInputContainer: document.getElementById('chat-input-container'),
+        loginModalContainer: document.getElementById('login-modal-container'),
+      };
+      
+      // --- START: GEMINI API SERVICE ---
+      let ai;
+      try {
+        ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      } catch (e) {
+        console.error("Failed to initialize GoogleGenAI. Is API_KEY set?", e);
+        alert("API_KEY is not configured. Please set the API_KEY environment variable.");
+      }
+
+      const generateImage = async (prompt) => {
+        try {
+            const response = await ai.models.generateImages({
+                model: 'imagen-3.0-generate-002',
+                prompt: prompt,
+                config: { numberOfImages: 1, outputMimeType: 'image/jpeg' },
+            });
+
+            if (response.generatedImages && response.generatedImages.length > 0) {
+                return { base64Data: response.generatedImages[0].image.imageBytes, mimeType: 'image/jpeg' };
+            } else {
+                throw new Error("No image was generated. This might be due to safety filters. Please try a different prompt.");
+            }
+        } catch (error) {
+            console.error("Error generating image:", error);
+            const errorMessage = error instanceof Error ? error.message : "An unknown API error occurred.";
+            throw new Error(`Failed to generate image: ${errorMessage}`);
+        }
+      };
+      
+      const sendMessageStream = async (history, prompt, image, onChunk, onError, onComplete) => {
+          try {
+              const contents = history.map(msg => {
+                  const parts = [];
+                  if (msg.text.trim()) parts.push({ text: msg.text });
+                  if (msg.image) {
+                      const match = msg.image.match(/^data:(.+);base64,(.+)$/);
+                      if (match) parts.push({ inlineData: { data: match[2], mimeType: match[1] } });
+                  }
+                  return { role: msg.sender === 'user' ? 'user' : 'model', parts };
+              }).filter(c => c.parts.length > 0);
+
+              const userParts = [];
+              if (prompt.trim()) userParts.push({ text: prompt });
+              if (image) userParts.push({ inlineData: { data: image.base64Data, mimeType: image.mimeType } });
+              
+              if (userParts.length > 0) {
+                  contents.push({ role: 'user', parts: userParts });
+              } else {
+                  onComplete();
+                  return;
+              }
+
+              const result = await ai.models.generateContentStream({
+                   model: 'gemini-2.5-flash-preview-04-17',
+                   contents: contents
+              });
+
+              for await (const chunk of result) {
+                  onChunk(chunk.text);
+              }
+          } catch (error) {
+              console.error("Error sending message:", error);
+              onError("Sorry, I encountered an error. Please try again.");
+          } finally {
+              onComplete();
+          }
+      };
+
+
+      // --- START: RENDER FUNCTIONS ---
+      const renderSidebar = () => {
+        const { sessions, activeSessionId, user, isExpanded, isMobileOpen } = state;
+        const sidebarContentHTML = `
+            <div class="flex flex-col flex-1">
+              <div class="flex items-center mb-6 ${isExpanded ? 'justify-between' : 'justify-center'}">
+                <button id="sidebar-toggle-desktop" class="p-3 text-gray-600 hover:bg-gray-200 rounded-full transition-colors hidden md:block">
+                  <svg class="w-6 h-6" fill="currentColor"><use href="#icon-menu"></use></svg>
+                </button>
+                <button id="new-chat-btn-sidebar" class="p-3 text-gray-800 rounded-2xl transition-colors ${isExpanded ? 'bg-gray-200 hover:bg-gray-300 flex-grow ml-2' : 'bg-gray-200 hover:bg-gray-300'}">
+                  ${isExpanded ? `<span class="font-semibold">New Chat</span>` : `<svg class="w-6 h-6" fill="currentColor"><use href="#icon-pencil"></use></svg>`}
+                </button>
+              </div>
+              <div class="flex-1 overflow-y-auto sidebar-scroll ${isExpanded ? 'pr-2' : ''}">
+                 ${isExpanded ? `<h2 class="text-sm font-semibold text-gray-500 mb-2 px-3">Recent</h2>` : ''}
+                 <nav class="flex flex-col space-y-1">
+                  ${sessions.map(session => `
+                    <a href="#" data-session-id="${session.id}" class="session-link flex items-center gap-3 p-3 rounded-lg text-sm font-medium transition-colors ${activeSessionId === session.id ? 'bg-gray-200 text-gray-900' : 'text-gray-600 hover:bg-gray-100'} ${!isExpanded ? 'justify-center' : ''}">
+                      <svg class="w-5 h-5 flex-shrink-0" fill="currentColor"><use href="#icon-chat-bubble"></use></svg>
+                      ${isExpanded ? `<span class="truncate flex-1">${session.title}</span>` : ''}
+                    </a>
+                  `).join('')}
+                 </nav>
+              </div>
+            </div>
+            <div class="flex flex-col space-y-2">
+              ${user ? `
+                <div class="flex items-center gap-3 p-2 rounded-lg ${!isExpanded ? 'justify-center' : ''}">
+                   <div class="w-9 h-9 bg-blue-500 text-white flex items-center justify-center rounded-full font-bold text-lg flex-shrink-0">
+                     ${user.charAt(0).toUpperCase()}
+                   </div>
+                   ${isExpanded ? `
+                     <div class="flex-1 flex items-center justify-between">
+                       <span class="font-semibold truncate">${user}</span>
+                       <button id="logout-btn" class="p-2 text-gray-500 hover:text-gray-900">
+                         <svg class="w-5 h-5" fill="currentColor"><use href="#icon-arrow-right-on-rect"></use></svg>
+                       </button>
+                     </div>
+                   ` : ''}
+                </div>
+              ` : `
+                <button id="login-btn-sidebar" class="flex items-center gap-3 p-3 rounded-lg text-sm font-medium transition-colors text-gray-600 hover:bg-gray-100 ${!isExpanded ? 'justify-center' : ''}">
+                   <svg class="w-5 h-5 flex-shrink-0" fill="currentColor"><use href="#icon-user"></use></svg>
+                   ${isExpanded ? `<span class="font-semibold">Sign In</span>` : ''}
+                </button>
+              `}
+              <button class="flex items-center gap-3 p-3 rounded-lg text-sm font-medium transition-colors text-gray-600 hover:bg-gray-100 ${!isExpanded ? 'justify-center' : ''}">
+                  <svg class="w-5 h-5 flex-shrink-0" fill="currentColor"><use href="#icon-cog"></use></svg>
+                  ${isExpanded ? `<span class="font-semibold">Settings</span>` : ''}
+              </button>
+            </div>
+        `;
+        
+        dom.sidebarContainer.innerHTML = `
+          <div id="mobile-sidebar-overlay" class="fixed inset-0 bg-black/30 z-40 md:hidden transition-opacity ${isMobileOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}"></div>
+          <aside id="mobile-sidebar" class="fixed top-0 left-0 h-full bg-gray-50/95 backdrop-blur-sm flex flex-col p-3 z-50 transition-transform duration-300 ease-in-out md:hidden ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'}" style="width: 280px;">
+            ${sidebarContentHTML}
+          </aside>
+          <aside id="desktop-sidebar" class="hidden md:flex flex-col p-3 bg-gray-50/80 backdrop-blur-sm h-screen transition-all duration-300 ease-in-out ${isExpanded ? 'w-64' : 'w-20'}">
+            ${sidebarContentHTML}
+          </aside>
+        `;
+        attachSidebarEventListeners();
+      };
+
+      const renderTopBar = () => {
+        dom.topBarContainer.innerHTML = `
+          <header class="absolute top-0 left-0 p-4 w-full flex justify-between items-center z-10">
+              <button id="top-bar-menu-btn-desktop" class="p-2 text-gray-600 hidden md:block">
+                  <svg class="w-6 h-6" fill="currentColor"><use href="#icon-menu"></use></svg>
+              </button>
+              <button id="top-bar-menu-btn-mobile" class="p-2 text-gray-600 md:hidden">
+                  <svg class="w-6 h-6" fill="currentColor"><use href="#icon-menu"></use></svg>
+              </button>
+              <div class="flex items-center space-x-4">
+                  <button class="flex items-center gap-2 bg-white border border-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-lg hover:bg-gray-50 transition-colors shadow-sm">
+                      <svg class="w-5 h-5 text-purple-500" fill="currentColor"><use href="#icon-sparkle"></use></svg>
+                      Upgrade
+                  </button>
+              </div>
+          </header>
+        `;
+        attachTopBarEventListeners();
+      };
+
+      const renderChatInput = () => {
+        const { isLoading, imagePreview } = state;
+        const imagePreviewHTML = imagePreview ? `
+          <div class="relative w-24 h-24 mb-2 p-2 border border-gray-200 rounded-lg bg-white">
+            <img src="${imagePreview}" alt="Selected preview" class="w-full h-full object-cover rounded"/>
+            <button type="button" id="remove-image-btn" class="absolute -top-2 -right-2 bg-gray-700 text-white rounded-full p-1 hover:bg-black">
+                <svg class="w-4 h-4" fill="currentColor"><use href="#icon-x-mark"></use></svg>
+            </button>
+          </div>
+        ` : '';
+        
+        dom.chatInputContainer.innerHTML = `
+          <div class="w-full">
+            ${imagePreviewHTML}
+            <div class="relative">
+                <form id="chat-form" class="bg-gray-100 rounded-2xl p-2 flex flex-col w-full shadow-sm border border-gray-200">
+                    <div class="flex items-start">
+                        <textarea id="chat-textarea" placeholder="Ask Gemini..." ${isLoading ? 'disabled' : ''} class="flex-1 bg-transparent text-gray-800 placeholder-gray-500 focus:outline-none resize-none px-3 py-3" rows="1" style="max-height: 200px;" autocomplete="off"></textarea>
+                        <button type="submit" id="send-btn" ${isLoading ? 'disabled' : ''} class="bg-gray-800 text-white rounded-full p-3 flex items-center justify-center self-end hover:bg-black disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors">
+                            <svg class="w-5 h-5" fill="currentColor"><use href="#icon-send"></use></svg>
+                        </button>
+                    </div>
+                    <div class="flex items-center space-x-2 mt-2 px-2 pb-1">
+                       <input type="file" id="file-upload" class="hidden" accept="image/*"/>
+                       <button type="button" id="file-upload-btn" ${isLoading ? 'disabled' : ''} class="p-2 text-gray-500 hover:text-black disabled:opacity-50">
+                          <svg class="w-5 h-5" fill="currentColor"><use href="#icon-plus"></use></svg>
+                       </button>
+                       <button type="button" class="text-gray-500 text-sm font-medium hover:text-black disabled:opacity-50" ${isLoading ? 'disabled' : ''}>Deep Research</button>
+                       <button type="button" class="text-gray-500 text-sm font-medium hover:text-black disabled:opacity-50" ${isLoading ? 'disabled' : ''}>Canvas</button>
+                       <button type="button" class="p-2 text-gray-500 hover:text-black ml-auto disabled:opacity-50" ${isLoading ? 'disabled' : ''}>
+                          <svg class="w-5 h-5" fill="currentColor"><use href="#icon-microphone"></use></svg>
+                       </button>
+                    </div>
+                </form>
+            </div>
+          </div>
+        `;
+        attachChatInputEventListeners();
+      };
+      
+      const renderMainContent = () => {
+        const { sessions, activeSessionId, user, isLoading } = state;
+        const activeSession = sessions.find(s => s.id === activeSessionId);
+
+        if (activeSession && activeSession.messages.length === 0) {
+            dom.mainContent.innerHTML = `
+                <div class="flex-1 flex flex-col items-center justify-center text-center px-4">
+                   <div class="w-16 h-16 rounded-full bg-gradient-to-br from-red-500 to-orange-400 mb-6"></div>
+                   <h1 class="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-600 to-black">
+                       Hello, ${user || 'there'}
+                   </h1>
+                </div>
+            `;
+        } else {
+            const messagesHTML = activeSession?.messages.map(msg => {
+                const isUser = msg.sender === 'user';
+                const userInitial = user ? user.charAt(0).toUpperCase() : '';
+                
+                if (msg.text.trim() === '' && !msg.image && !isUser) return '';
+
+                return `
+                    <div class="flex items-start gap-3 w-full">
+                       <div class="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center font-bold ${isUser ? 'bg-blue-500 text-white' : 'bg-gradient-to-br from-red-500 to-orange-400 text-white'}">
+                          ${isUser ? (userInitial || `<svg class="w-5 h-5" fill="currentColor"><use href="#icon-user"></use></svg>`) : `<svg class="w-5 h-5" fill="currentColor"><use href="#icon-bot"></use></svg>`}
+                       </div>
+                       <div class="flex flex-col items-start w-full">
+                          <span class="font-bold text-sm mb-1">${isUser ? 'You' : 'Landino'}</span>
+                          <div class="max-w-xl rounded-2xl shadow-sm ${isUser ? 'bg-gray-800 text-white' : 'bg-gray-100 text-gray-800'}">
+                            ${msg.image ? `<img src="${msg.image}" alt="Chat content" class="rounded-t-2xl max-h-80 w-full object-cover"/>` : ''}
+                            ${msg.text.trim() ? `<p class="whitespace-pre-wrap p-4">${msg.text}</p>` : ''}
+                          </div>
+                      </div>
+                    </div>
+                `;
+            }).join('') || '';
+
+            const lastMessage = activeSession?.messages[activeSession.messages.length - 1];
+            const showTypingIndicator = isLoading && (activeSession?.messages.length === 0 || lastMessage?.sender === 'user');
+
+            const typingIndicatorHTML = showTypingIndicator ? `
+              <div class="flex items-center space-x-2 self-start ml-11">
+                  <div class="p-3 bg-gray-100 rounded-lg flex items-center space-x-2">
+                      <span class="block w-2 h-2 bg-gray-500 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                      <span class="block w-2 h-2 bg-gray-500 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                      <span class="block w-2 h-2 bg-gray-500 rounded-full animate-bounce"></span>
+                  </div>
+              </div>
+            ` : '';
+
+            dom.mainContent.innerHTML = `
+              <div id="message-list" class="flex-1 overflow-y-auto p-4 md:p-6">
+                <div class="flex flex-col space-y-4">
+                  ${messagesHTML}
+                  ${typingIndicatorHTML}
+                  <div id="messages-end-ref"></div>
+                </div>
+              </div>
+            `;
+            document.getElementById('messages-end-ref')?.scrollIntoView({ behavior: 'smooth' });
+        }
+      };
+
+      const renderLoginModal = () => {
+        if (!state.isLoginOpen) {
+          dom.loginModalContainer.innerHTML = '';
+          return;
+        }
+        dom.loginModalContainer.innerHTML = `
+          <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div class="bg-white rounded-lg shadow-xl w-full max-w-md">
+              <div class="flex justify-between items-center p-4 border-b border-gray-200">
+                <h2 class="text-lg font-bold text-gray-800">Sign In</h2>
+                <button id="login-close-btn" class="p-1 rounded-full hover:bg-gray-100">
+                  <svg class="w-6 h-6 text-gray-500" fill="currentColor"><use href="#icon-x-mark"></use></svg>
+                </button>
+              </div>
+              <form id="login-form" class="p-6 space-y-4">
+                <div>
+                  <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                  <input id="name" type="text" class="w-full bg-gray-50 border border-gray-300 rounded-md py-2 px-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter your name" required />
+                </div>
+                <div>
+                  <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                  <input id="password" type="password" class="w-full bg-gray-50 border border-gray-300 rounded-md py-2 px-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter your password" required />
+                </div>
+                <div class="pt-2">
+                  <button id="login-submit-btn" type="submit" class="w-full bg-gray-800 text-white font-semibold py-2.5 px-4 rounded-lg hover:bg-black transition-colors" disabled>
+                    Sign In
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        `;
+        attachLoginModalEventListeners();
+      };
+      
+      // --- START: STATE LOGIC & HANDLERS ---
+      
+      const setState = (updates) => {
+        const oldState = { ...state };
+        Object.assign(state, updates);
+        
+        // Determine what needs re-rendering
+        if (updates.isSidebarExpanded !== undefined || updates.sessions || updates.activeSessionId !== undefined || updates.user !== undefined) {
+          renderSidebar();
+        }
+        if (updates.isSidebarExpanded !== undefined) {
+          renderTopBar();
+        }
+        if(updates.isLoading !== undefined || updates.imagePreview !== undefined) {
+          renderChatInput();
+        }
+        if (updates.sessions || updates.activeSessionId !== undefined || updates.user !== undefined || updates.isLoading !== undefined) {
+          renderMainContent();
+        }
+        if (updates.isLoginOpen !== undefined) {
+          renderLoginModal();
+        }
+        if(updates.isSidebarOpen !== undefined && oldState.isSidebarOpen !== state.isSidebarOpen){
+            renderSidebar();
+        }
+      };
+
+      const handleNewChat = () => {
+        const newSession = {
+          id: `session-${Date.now()}`,
+          title: 'New Chat',
+          messages: [],
+        };
+        const newSessions = [newSession, ...state.sessions];
+        setState({ sessions: newSessions, activeSessionId: newSession.id, isSidebarOpen: false });
+        localStorage.setItem('landino-sessions', JSON.stringify(newSessions));
+      };
+      
+      const handleSelectSession = (id) => setState({ activeSessionId: id, isSidebarOpen: false });
+      
+      const handleLogin = (name) => {
+        setState({ user: name, isLoginOpen: false });
+        localStorage.setItem('landino-user', name);
+      };
+      
+      const handleLogout = () => {
+        setState({ user: null });
+        localStorage.removeItem('landino-user');
+      };
+      
+      const handleSendMessage = async (text, image) => {
+        if ((!text.trim() && !image) || !state.activeSessionId) return;
+        
+        const trimmedText = text.trim();
+        const isImageGenCommand = trimmedText.toLowerCase().startsWith('create ');
+        
+        const userMessage = {
+          id: `user-${Date.now()}`,
+          text,
+          sender: 'user',
+          image: image ? `data:${image.mimeType};base64,${image.data}` : undefined,
+        };
+        
+        let currentSession = state.sessions.find(s => s.id === state.activeSessionId);
+        if (!currentSession) return;
+        
+        setState({ isLoading: true });
+        
+        const isNewChat = currentSession.messages.length === 0;
+        const newTitle = isNewChat ? trimmedText.substring(0, 30) + (trimmedText.length > 30 ? '...' : '') : currentSession.title;
+        
+        const updatedSessions = state.sessions.map(session =>
+          session.id !== state.activeSessionId
+            ? session
+            : { ...session, title: newTitle, messages: [...session.messages, userMessage] }
+        );
+        setState({ sessions: updatedSessions });
+        
+        currentSession = updatedSessions.find(s => s.id === state.activeSessionId);
+        const history = currentSession.messages;
+
+        if (isImageGenCommand) {
+            const imagePrompt = trimmedText.substring('create '.length);
+            try {
+                const generatedImage = await generateImage(imagePrompt);
+                const botMessage = {
+                    id: `bot-${Date.now()}`,
+                    text: `Here's what I created for: "${imagePrompt}"`,
+                    sender: 'bot',
+                    image: `data:${generatedImage.mimeType};base64,${generatedImage.base64Data}`
+                };
+                const finalSessions = state.sessions.map(s => s.id !== state.activeSessionId ? s : {...s, messages: [...s.messages, botMessage]});
+                setState({ sessions: finalSessions });
+            } catch (error) {
+                 const errorText = error instanceof Error ? error.message : "An unknown error occurred.";
+                 const errorMessage = { id: `bot-error-${Date.now()}`, text: errorText, sender: 'bot' };
+                 const finalSessions = state.sessions.map(s => s.id !== state.activeSessionId ? s : {...s, messages: [...s.messages, errorMessage]});
+                 setState({ sessions: finalSessions });
+            } finally {
+                setState({ isLoading: false });
+            }
+        } else {
+            const botMessageId = `bot-${Date.now()}`;
+            const sessionsWithPlaceholder = state.sessions.map(s =>
+                s.id !== state.activeSessionId ? s : { ...s, messages: [...s.messages, { id: botMessageId, text: '', sender: 'bot' }] }
+            );
+            setState({ sessions: sessionsWithPlaceholder });
+
+            await sendMessageStream(
+              history, text, image ? { base64Data: image.data, mimeType: image.mimeType } : null,
+              (chunk) => {
+                const updatedSessions = state.sessions.map(s => {
+                  if (s.id !== state.activeSessionId) return s;
+                  const lastMsg = s.messages[s.messages.length - 1];
+                  if (lastMsg?.id === botMessageId) {
+                    lastMsg.text += chunk;
+                    return { ...s, messages: [...s.messages] };
+                  }
+                  return s;
+                });
+                setState({ sessions: updatedSessions });
+                document.getElementById('messages-end-ref')?.scrollIntoView({ behavior: 'smooth' });
+              },
+              (errorText) => {
+                const updatedSessions = state.sessions.map(s => {
+                  if (s.id !== state.activeSessionId) return s;
+                  const lastMsg = s.messages[s.messages.length - 1];
+                  if (lastMsg?.id === botMessageId) {
+                    lastMsg.text = errorText;
+                    return { ...s, messages: [...s.messages] };
+                  }
+                  return s;
+                });
+                setState({ sessions: updatedSessions });
+              },
+              () => setState({ isLoading: false })
+            );
+        }
+        localStorage.setItem('landino-sessions', JSON.stringify(state.sessions));
+      };
+      
+      // --- START: EVENT LISTENERS ---
+      
+      function attachSidebarEventListeners() {
+        document.getElementById('sidebar-toggle-desktop')?.addEventListener('click', () => setState({ isSidebarExpanded: !state.isSidebarExpanded }));
+        document.getElementById('new-chat-btn-sidebar')?.addEventListener('click', handleNewChat);
+        document.querySelectorAll('.session-link').forEach(link => {
+          link.addEventListener('click', (e) => {
+            e.preventDefault();
+            handleSelectSession(link.dataset.sessionId);
+          });
+        });
+        document.getElementById('login-btn-sidebar')?.addEventListener('click', () => setState({ isLoginOpen: true }));
+        document.getElementById('logout-btn')?.addEventListener('click', handleLogout);
+        document.getElementById('mobile-sidebar-overlay')?.addEventListener('click', () => setState({isSidebarOpen: false}));
+      }
+
+      function attachTopBarEventListeners() {
+        document.getElementById('top-bar-menu-btn-desktop')?.addEventListener('click', () => setState({ isSidebarExpanded: !state.isSidebarExpanded }));
+        document.getElementById('top-bar-menu-btn-mobile')?.addEventListener('click', () => setState({ isSidebarOpen: true }));
+      }
+      
+      function attachChatInputEventListeners() {
+        const form = document.getElementById('chat-form');
+        const textarea = document.getElementById('chat-textarea');
+        const fileInput = document.getElementById('file-upload');
+
+        const removeImage = () => {
+          setState({ imageFile: null, imagePreview: null });
+          fileInput.value = "";
+        };
+
+        document.getElementById('remove-image-btn')?.addEventListener('click', removeImage);
+        
+        form?.addEventListener('submit', (e) => {
+          e.preventDefault();
+          handleSendMessage(textarea.value, state.imageFile ? { data: state.imagePreview.split(',')[1], mimeType: state.imageFile.type } : null);
+          textarea.value = '';
+          textarea.style.height = 'auto';
+          removeImage();
+        });
+        
+        textarea?.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            form.requestSubmit();
+          }
+        });
+        
+        textarea?.addEventListener('input', (e) => {
+          e.target.style.height = 'auto';
+          e.target.style.height = `${e.target.scrollHeight}px`;
+        });
+        
+        document.getElementById('file-upload-btn')?.addEventListener('click', () => fileInput.click());
+
+        fileInput?.addEventListener('change', (e) => {
+          const file = e.target.files?.[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+              setState({ imageFile: file, imagePreview: reader.result });
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+      }
+
+      function attachLoginModalEventListeners() {
+        const form = document.getElementById('login-form');
+        const nameInput = document.getElementById('name');
+        const passInput = document.getElementById('password');
+        const submitBtn = document.getElementById('login-submit-btn');
+
+        document.getElementById('login-close-btn')?.addEventListener('click', () => setState({ isLoginOpen: false }));
+        form?.addEventListener('submit', (e) => {
+          e.preventDefault();
+          handleLogin(nameInput.value);
+        });
+        
+        const validate = () => {
+            submitBtn.disabled = !nameInput.value.trim() || !passInput.value.trim();
+        };
+
+        nameInput?.addEventListener('input', validate);
+        passInput?.addEventListener('input', validate);
+      }
+      
+      // --- START: INITIALIZATION ---
+      function init() {
+        const loggedInUser = localStorage.getItem('landino-user');
+        const savedSessions = localStorage.getItem('landino-sessions');
+        
+        const initialState = { ...state };
+        if (loggedInUser) initialState.user = loggedInUser;
+        if (savedSessions) {
+          const parsedSessions = JSON.parse(savedSessions);
+          initialState.sessions = parsedSessions;
+          if (parsedSessions.length > 0) {
+            initialState.activeSessionId = parsedSessions[0].id;
+          }
+        }
+        
+        setState(initialState);
+        
+        if (!initialState.activeSessionId) {
+            handleNewChat();
+        } else {
+            renderSidebar();
+            renderTopBar();
+            renderChatInput();
+            renderMainContent();
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', init);
+
+    </script>
+  </body>
+</html>
